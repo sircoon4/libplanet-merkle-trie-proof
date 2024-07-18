@@ -69,7 +69,8 @@ func nodeFromData(data any) (node, error) {
 		list := data
 		if len(list) == 2 {
 			if list[0] == nil {
-				value, err := bencodex.Encode(list[1])
+				encoded := list[1]
+				value, err := bencodex.Encode(encoded)
 				if err != nil {
 					return nil, err
 				}
