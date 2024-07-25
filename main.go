@@ -72,6 +72,14 @@ func main() {
 	}
 	fmt.Println(ok)
 	fmt.Println()
+
+	fmt.Println("sampleFromLibConsole")
+	ok, err = ValidateProof(sampleFromLibConsole())
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(ok)
+	fmt.Println()
 }
 
 func ValidateProof(

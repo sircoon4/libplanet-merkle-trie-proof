@@ -1,6 +1,11 @@
 package main
 
-import "encoding/hex"
+import (
+	"encoding/hex"
+	"fmt"
+
+	"github.com/sircoon4/bencodex-go"
+)
 
 // stateRootHash []byte => sha256(bencoded)
 // proof [][]byte => bencoded list
@@ -204,4 +209,57 @@ func sampleFalseProof() (stateRootHash []byte, proof [][]byte, key []byte, value
 	value, _ = hex.DecodeString("75323a3031")
 
 	return
+}
+
+func sampleFromLibConsole() (stateRootHash []byte, proof [][]byte, key []byte, value []byte) {
+	stateRootHash, _ = hex.DecodeString("1bb0734cffb2226288fbb5124e560deb3322a0957a710829082d25e51872c84d")
+
+	proofData, _ := hex.DecodeString("6c6c6e6e6e33323aa05901b256bc5c70e94b294c6d8bd9446d2d7f9cb47645a5869afb779f1054176e6e6e6e6e6e6e6e6e6e6e6e6c6e6c6939656565656c323a010333323acd7c05916ad1c68c19fa275a7409ec15a2af3dcf13ffe1b4b3fa03a5e4885c99656c33323a730d10e492580dc2b071e0a2462f9a28b90be9d275e0a44711965afee77d5e316e33323a3322fd72c0ad2c681e715b82b5ac5395710510e24a70baa2fb4fb037cf6227186e6e6e6e6e6e6e6e6e6e6e6e6e6e656c37363a0307060206030306030103090603030106030309030703080605060506050306030303090303060303070308030406060605060203010605060403030306030606050604030003090306060633323ab592c07326758348b4cbf4be9be98d028381d4251308785859f7148ba333aedb656c6e33323ac606a553d2e65a72cbb8ea34dcadf14d65a3c4d8cda8ff7368cd6c35a12e7fe06565")
+	bParsed, _ := bencodex.Decode(proofData)
+	fmt.Println(bParsed)
+
+	proof = [][]byte{}
+	for _, p := range bParsed.([]interface{}) {
+		encoded, err := bencodex.Encode(p)
+		if err != nil {
+			panic(err)
+		}
+		proof = append(proof, encoded)
+	}
+
+	key, _ = hex.DecodeString("127bc619c1c978eee6393c784feb1ed366ed096f")
+	key = addressToStateKey(key)
+
+	value, _ = hex.DecodeString("33323ac606a553d2e65a72cbb8ea34dcadf14d65a3c4d8cda8ff7368cd6c35a12e7fe0")
+
+	return
+}
+
+func addressToStateKey(address []byte) []byte {
+	conversionTable := []byte{
+		48,  // '0'
+		49,  // '1'
+		50,  // '2'
+		51,  // '3'
+		52,  // '4'
+		53,  // '5'
+		54,  // '6'
+		55,  // '7'
+		56,  // '8'
+		57,  // '9'
+		97,  // 'a'
+		98,  // 'b'
+		99,  // 'c'
+		100, // 'd'
+		101, // 'e'
+		102, // 'f'
+	}
+
+	buffer := make([]byte, len(address)*2)
+	for i := 0; i < len(address); i++ {
+		buffer[i*2] = conversionTable[address[i]/16]
+		buffer[i*2+1] = conversionTable[address[i]%16]
+	}
+
+	return buffer
 }
