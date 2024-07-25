@@ -9,9 +9,10 @@ func TestValidateProof(t *testing.T) {
 		ok, err := ValidateProof(sample())
 		if err != nil {
 			t.Error(err)
-		}
-		if !ok {
+		} else if !ok {
 			t.Error("Proof validation failed")
+		} else {
+			t.Log("Proof validation succeeded")
 		}
 	}
 }
