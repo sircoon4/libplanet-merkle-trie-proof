@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"fmt"
+
+	"github.com/sircoon4/bencodex-go"
 )
 
 func keybytesToNibbles(str []byte) []byte {
@@ -18,9 +20,14 @@ func keybytesToNibbles(str []byte) []byte {
 
 func checkProofNodeHash(
 	targetHash []byte, // sha256(bencoded)
-	bencodedProofNode []byte, // bencoded
+	proofData any, // bencodex type
 	first bool,
 ) error {
+	bencodedProofNode, err := bencodex.Encode(proofData)
+	if err != nil {
+		return err
+	}
+
 	if !first && len(bencodedProofNode) <= sha256.Size {
 		return fmt.Errorf("proof node must be longer than hash size")
 	}
